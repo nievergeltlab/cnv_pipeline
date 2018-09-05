@@ -1,0 +1,27 @@
+#!/bin/bash
+
+#SBATCH -o errandout
+#SBATCH -e errandout
+#SBATCH --export=ALL
+#SBATCH -t 02:05:00
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+
+#!/bin/bash
+study=psy4
+cd /home/amaihofer/"$study"
+
+ #Write the start and stop points of the file
+
+for files in $(cat /home/amaihofer/"$study"/penncnv/"$study"split"$SLURM_ARRAY_TASK_ID")
+do
+  #Make a PennCNV ready file if necessary
+  #awk -F"\t" -v datname=$files 'BEGIN{OFS="\t";} NR>9{if(NR==10) print "Name", datname".B Allele Freq", datname".Log R Ratio" ; else  print $2,$10,$11}'  /oasis/scratch/comet/amaihofer/temp_project/"$study"/intensities/$files > /oasis/scratch/comet/amaihofer/temp_project/"$study"/intensities_penncnv/$files
+  
+  #Run CNV detection
+  /home/amaihofer/usr/perl-5.14.2/bin/perl /home/amaihofer/PennCNV-master/detect_cnv.pl -test -hmm /home/amaihofer/PennCNV-master/lib/hhall.hmm \
+ -pfb /home/amaihofer/"$study"/penncnv/"$study".pfb /oasis/scratch/comet/amaihofer/temp_project/"$study"/intensities_penncnv//"$files" -conf -gcmodel  /home/amaihofer/"$study"/penncnv/"$study"_gcmodel -log /home/amaihofer/"$study"/penncnv/calls/"$files".log \
+ -out /home/amaihofer/"$study"/penncnv/calls/"$files".rawcnv 
+
+done
+

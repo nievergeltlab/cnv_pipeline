@@ -1,0 +1,30 @@
+#! /bin/bash
+#PBS -N GS_Plate1_FinalReport.txt.FxTb65A5
+#PBS -e .tmp/GS_Plate1_FinalReport.txt.FxTb65A5.qerr
+#PBS -o .tmp/GS_Plate1_FinalReport.txt.FxTb65A5.qout
+#PBS -l vmem=2gb
+#PBS -l walltime=4:00:00
+#SBATCH --ntasks-per-node=1
+
+hostname
+
+source ~/.bashrc
+
+cd /home/amaihofer/safr
+
+
+for plate in {1..8}
+do
+for sample in $(cat plate"$plate"_samples.txt )
+do
+ echo $sample
+ #Correct but a little slower
+ grep -m $nsnp -P "^\S+\s+$sample\b" /oasis/scratch/comet/amaihofer/temp_project/safr/intensities/GS_Plate"$plate"_FinalReport.txt  | cat sample_header.txt -  > /oasis/scratch/comet/amaihofer/temp_project/safr/intensities/split/"$sample".txt
+ #correct but slowest
+done
+done
+
+
+
+#Generate a file name indicating job finished
+touch .tmp/allplates.done
